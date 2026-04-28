@@ -138,6 +138,7 @@ func (w ConsoleWriter) Write(p []byte) (n int, err error) {
 	var evt map[string]interface{}
 	p = decodeIfBinaryToBytes(p)
 	d := json.NewDecoder(bytes.NewReader(p))
+	d.UseNumber()
 	err = d.Decode(&evt)
 	if err != nil {
 		return n, fmt.Errorf("cannot decode event: %s", err)
@@ -150,8 +151,8 @@ func (w ConsoleWriter) Write(p []byte) (n int, err error) {
 		}
 	}
 
-	for i := len(w.PartsOrder) - 1; i >= 0; i-- {
-		w.writePart(buf, evt, w.PartsOrder[i])
+	for _, p := range w.PartsOrder {
+		w.writePart(buf, evt, p)
 	}
 
 	w.writeFields(evt, buf)
@@ -169,7 +170,7 @@ func (w ConsoleWriter) Write(p []byte) (n int, err error) {
 	}
 
 	_, err = buf.WriteTo(w.Out)
-	return n, err
+	return len(p), err
 }
 
 // Call the underlying writer's Close method if it is an io.Closer. Otherwise
