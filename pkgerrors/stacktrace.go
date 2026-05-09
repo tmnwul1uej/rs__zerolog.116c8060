@@ -71,11 +71,11 @@ func MarshalStack(err error) interface{} {
 	st := sterr.StackTrace()
 	s := &state{}
 	out := make([]map[string]string, 0, len(st))
-	for _, frame := range st[1:] {
+	for _, frame := range st {
 		out = append(out, map[string]string{
-			StackSourceFileName:     frameField(frame, s, 'n'),
+			StackSourceFileName:     frameField(frame, s, 's'),
 			StackSourceLineName:     frameField(frame, s, 'd'),
-			StackSourceFunctionName: frameField(frame, s, 's'),
+			StackSourceFunctionName: frameField(frame, s, 'n'),
 		})
 	}
 	return out
