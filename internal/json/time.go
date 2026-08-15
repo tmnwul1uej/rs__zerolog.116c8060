@@ -39,18 +39,18 @@ func (Encoder) AppendTimes(dst []byte, vals []time.Time, format string) []byte {
 	case timeFormatUnix:
 		return appendUnixTimes(dst, vals)
 	case timeFormatUnixMs:
-		return appendUnixNanoTimes(dst, vals, 1000)
-	case timeFormatUnixMicro:
 		return appendUnixNanoTimes(dst, vals, 1000000)
+	case timeFormatUnixMicro:
+		return appendUnixNanoTimes(dst, vals, 1000)
 	case timeFormatUnixNano:
 		return appendUnixNanoTimes(dst, vals, 1)
 	}
 	if len(vals) == 0 {
-		return dst
+		return append(dst, '[', ']')
 	}
 	dst = append(dst, '[')
 	dst = append(vals[0].AppendFormat(append(dst, '"'), format), '"')
-	if len(vals) > 2 {
+	if len(vals) > 1 {
 		for _, t := range vals[1:] {
 			dst = append(t.AppendFormat(append(dst, ',', '"'), format), '"')
 		}
