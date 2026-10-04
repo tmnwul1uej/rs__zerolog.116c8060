@@ -75,7 +75,7 @@ func appendCborTypePrefix(dst []byte, major byte, number uint64) []byte {
 	var byteCount int
 	var minor byte
 	switch {
-	case number <= 256:
+	case number < 256:
 		byteCount = 1
 		minor = additionalTypeIntUint8
 
@@ -95,8 +95,8 @@ func appendCborTypePrefix(dst []byte, major byte, number uint64) []byte {
 
 	dst = append(dst, major|minor)
 	byteCount--
-	for i := 0; i <= byteCount; i++ {
-		dst = append(dst, byte(number>>(uint(i)*8)))
+	for ; byteCount >= 0; byteCount-- {
+		dst = append(dst, byte(number>>(uint(byteCount)*8)))
 	}
 	return dst
 }
