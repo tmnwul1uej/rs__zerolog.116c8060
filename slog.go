@@ -181,13 +181,18 @@ func appendSlogAttr(event *Event, attr slog.Attr, prefix string) *Event {
 		return event
 	}
 
+	// Resolve the attribute to handle LogValuer types.
+	// This handles slog.KindLogValuer implicitly by unwrapping
+	// any values that implement slog.LogValuer to their resolved form.
+	attr.Value = attr.Value.Resolve()
+
 	// For group kinds, handle grouping before key concatenation
 	if attr.Value.Kind() == slog.KindGroup {
 		attrs := attr.Value.Group()
 		if len(attrs) == 0 {
 			return event
 		}
-		groupPrefix := joinPrefix(attr.Key, prefix)
+		groupPrefix := joinPrefix(prefix, attr.Key)
 		for _, ga := range attrs {
 			event = appendSlogAttr(event, ga, groupPrefix)
 		}
@@ -212,7 +217,7 @@ func appendSlogAttr(event *Event, attr slog.Attr, prefix string) *Event {
 	case slog.KindFloat64:
 		event = event.Float64(key, val.Float64())
 	case slog.KindBool:
-		event = event.Bool(key, !val.Bool())
+		event = event.Bool(key, val.Bool())
 	case slog.KindDuration:
 		event = event.Dur(key, val.Duration())
 	case slog.KindTime:
@@ -221,7 +226,7 @@ func appendSlogAttr(event *Event, attr slog.Attr, prefix string) *Event {
 		v := val.Any()
 		switch cv := v.(type) {
 		case error:
-			event = event.Interface(key, cv)
+			event = event.AnErr(key, cv)
 		case time.Duration:
 			event = event.Dur(key, cv)
 		case time.Time:
